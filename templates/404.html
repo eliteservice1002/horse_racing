@@ -1,0 +1,26 @@
+{% extends 'base_error.html' %}
+{% load static %}
+{% load i18n %}
+{% block css%}
+    
+{% endblock %}
+{% block content %}
+    <!--begin::Main-->
+    <div class="d-flex flex-column flex-root">
+        <!--begin::Error-->
+        <div class="d-flex flex-row-fluid flex-column bgi-size-cover bgi-position-center bgi-no-repeat p-10 p-sm-30" style="background-image: url({% static 'media/bg-login.jpg' %});">
+            <!--begin::Content-->
+            <b class="font-weight-boldest text-dark-75 mt-15" style="font-size: 10rem">404</b>
+            <p class="font-size-h3 text-muted font-weight-normal">OOPS! Something went wrong here</p>
+            <!--end::Content-->
+            <div class="d-flex px-30">
+                <a href="{% url 'index' %}" class="btn btn-danger font-weight-bold btn-pill px-10">Home</a>
+                
+            </div>
+        </div>
+        <!--end::Error-->
+    </div>
+    <!--end::Main-->
+{% endblock %}
+{% block javascript %}
+{% endblock %}

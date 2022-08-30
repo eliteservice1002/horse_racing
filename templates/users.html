@@ -1,0 +1,220 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+{% block css%}
+    <link href="{% static 'plugins/custom/datatables/datatables.bundle.css' %}" rel="stylesheet" type="text/css" />
+{% endblock %}
+{% block content %}
+    <!--begin::Container-->
+    <div class="container">
+        <div class="card card-custom gutter-b">
+            <div class="card-header flex-wrap py-3">
+                <div class="card-title">
+                    <h3 class="card-label">Users</h3>
+                </div>
+            </div>
+            <div class="card-body">
+                <table id="dataTable" class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Joining date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in users %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ item.username }}</td>
+                                <td>{{ item.email }}</td>
+                                <td>
+                                {% if item.is_staff %}
+                                    <span class="label label-lg font-weight-bold label-light-success label-inline">Active</span>
+                                {% else %}
+                                    {% if item.status == 1 %}
+                                        <span class="label label-lg font-weight-bold label-light-success label-inline">Active</span>
+                                        <b class="btn btn-sm btn-outline-danger ml-3 float-right btn_reject" data-id="{{ item.id }}">
+                                            <i class="fas fa-times"></i> Reject
+                                        </b>
+                                    {% elif item.status == 2 %}
+                                        <span class="label label-lg font-weight-bold label-light-danger label-inline">Cancelled</span>
+                                        <b class="btn btn-sm btn-outline-success ml-3 float-right btn_accept" data-id="{{ item.id }}">
+                                            <i class="fas fa-check"></i> Accept
+                                        </b>
+                                    {% else %}
+                                        <span class="label label-lg font-weight-bold label-light-primary label-inline">Pending</span>
+                                        <b class="btn btn-sm btn-outline-danger ml-3 float-right btn_reject" data-id="{{ item.id }}">
+                                            <i class="fas fa-times"></i> Reject
+                                        </b>
+                                        <b class="btn btn-sm btn-outline-success float-right btn_accept" data-id="{{ item.id }}">
+                                            <i class="fas fa-check"></i> Accept
+                                        </b>
+                                    {% endif %}
+                                {% endif %}
+                                </td>
+                                <td>{{ item.date_joined|date:'Y-m-d' }}</td>
+                                <td>
+                                    <a href="javascript:;" class="mr-3 btn_reset" title="Reset Password" data-id="{{ item.id }}"><i class="fas fa-key text-primary"></i></a>
+                                    {% if item.is_staff is False %}
+                                        <a href="javascript:;" class="btn_delete" title="Delete" data-id="{{ item.id }}"><i class="far fa-trash-alt text-danger"></i></a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- Reset Modal-->
+        <div class="modal fade" id="resetDlg" data-backdrop="static" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Reset Password</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <i aria-hidden="true" class="ki ki-close"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form class="form text-center" id="kt_reset_form">
+                            <div class="form-group">
+                                <input id="spassword" class="form-control h-auto py-4 px-8" type="password" placeholder="Password" name="password"  autocomplete="off"/>
+                            </div>
+                            <div class="form-group">
+                                <input class="form-control h-auto  py-4 px-8" type="password" placeholder="Confirm Password" name="cpassword"  autocomplete="off"/>
+                            </div>
+                            <input type="hidden" id="user_id" />
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light-primary font-weight-bold" data-dismiss="modal">Close</button>
+                        <button id="btn_reset_pass" type="button" class="btn btn-primary font-weight-bold">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Reset Modal-->
+       
+    </div>
+    <!--end::Container-->
+{% endblock %}
+{% block javascript %}
+    <script src="{% static 'plugins/custom/datatables/datatables.bundle.js' %}"></script>
+    <script>
+        $('#dataTable').DataTable({
+            columnDefs: [
+                { width: 270, targets: 3 }
+            ],
+        });
+        $('.btn_reset').on('click', function(){
+            $('#user_id').val($(this).data('id'));
+            $('#resetDlg').modal('show');
+        });
+        $('.btn_accept').on('click', function(){
+            $.ajax({
+                headers: { "X-CSRFToken": '{{csrf_token}}' },
+                url: '{% url "ajax-change-status" %}',
+                data: {
+                    'status': 1,
+                    'user_id': $(this).data('id'),
+                },
+                type: 'POST',
+                success: function (data) {
+                    location.reload();
+                }
+            });
+        });
+        $('.btn_reject').on('click', function(){
+            $.ajax({
+                headers: { "X-CSRFToken": '{{csrf_token}}' },
+                url: '{% url "ajax-change-status" %}',
+                data: {
+                    'status': 2,
+                    'user_id': $(this).data('id'),
+                },
+                type: 'POST',
+                success: function (data) {
+                    location.reload();
+                }
+            });
+        });
+        $('#btn_reset_pass').on('click', function(){
+            var validation;
+            validation = FormValidation.formValidation(
+                KTUtil.getById('kt_reset_form'),
+                {
+                    fields: {
+                        password: {
+                            validators: {
+                                notEmpty: {
+                                    message: 'The password is required'
+                                }
+                            }
+                        },
+                        cpassword: {
+                            validators: {
+                                notEmpty: {
+                                    message: 'The password confirmation is required'
+                                },
+                                identical: {
+                                    compare: function() {
+                                        return form.querySelector('[name="password"]').value;
+                                    },
+                                    message: 'The password and its confirm are not the same'
+                                }
+                            }
+                        },
+                    },
+                    plugins: {
+                        trigger: new FormValidation.plugins.Trigger(),
+                        bootstrap: new FormValidation.plugins.Bootstrap()
+                    }
+                }
+            );
+            validation.validate().then(function(status) {
+                if (status == 'Valid') {
+                    $.ajax({
+                        headers: { "X-CSRFToken": '{{csrf_token}}' },
+                        url: '{% url "ajax-admin-reset-password" %}',
+                        data: {
+                            'password': $("#spassword").val(),
+                            'user_id': $("#user_id").val()
+                        },
+                        type: 'POST',
+                        success: function (data) {
+                            $('#resetDlg').modal('hide');
+                        }
+                    });
+                }
+            });
+        });
+        $('.btn_delete').on('click', function(){
+            var user_id = $(this).data('id');
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Yes, delete it!"
+            }).then(function(result) {
+                if (result.value) {
+                     $.ajax({
+                        headers: { "X-CSRFToken": '{{csrf_token}}' },
+                        url: '{% url "ajax-delete-user" %}',
+                        data: {
+                            'user_id': user_id
+                        },
+                        type: 'POST',
+                        success: function (data) {
+                            location.reload();
+                        }
+                    });
+                }
+            });
+        })
+    </script>
+{% endblock %}

@@ -1,0 +1,17 @@
+Django==2.2
+gunicorn
+django-heroku
+requests
+pillow
+whitenoise
+dj_database_url
+pandas
+psycopg2
+psycopg2-binary
+django-storages==1.7.1
+djangorestframework
+pandas
+numpy
+beautifulsoup4
+django-q
+redis

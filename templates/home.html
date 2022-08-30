@@ -1,0 +1,1214 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+{% block css%}
+    <style>
+        th{
+            padding-left: 1px ! important;
+            padding-right: 4px ! important;
+            padding-top: 2px ! important;
+            padding-bottom: 2px ! important;
+        }
+        td{
+            padding-left: 3px ! important;
+            padding-right: 3px ! important;
+        }
+        .irs-bar {
+            border-top-color: #55b6ee;
+            border-bottom-color: #55b6ee;
+        } 
+
+        .irs-bar-edge {
+            border-color: #55b6ee;
+        }
+
+        .irs-single, .irs-bar-edge, .irs-bar {
+            background: #55b6ee !important;
+        }
+        .irs-from, .irs-to{
+            background-color: #55b6ee !important;
+        }
+
+    </style>
+{% endblock %}
+{% block content %}
+    <!--begin::Container-->
+    <div class="container-fluid">
+        <!--begin::SearchOption-->
+        <div class="accordion accordion-toggle-arrow" id="searchOptions">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title" data-toggle="collapse" data-target="#searchContent">
+                        Search Options
+                    </div>
+                </div>
+                <div id="searchContent" class="collapse show" data-parent="#searchOptions">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-12 col-lg-1 pl-2 pr-2">
+                                <span class="text-right">Date From</span>
+                                <input id="start_date" type="text" class="form-control" readonly="readonly" placeholder="Select start date" value="{{ from_date }}"/>
+                            </div>
+                            <div class="col-12 col-lg-1 pl-2 pr-2">
+                                <span class="text-right">Date To</span>
+                                <input  id="end_date"  type="text" class="form-control" readonly="readonly" placeholder="Select end date" value="{{ to_date }}"/>
+                            </div>
+                            <div class="col-12 col-lg-2 pl-2 pr-2">
+                                <span class="text-right">Country</span>
+                                <select class="form-control select2" id="sel_country" name="sel_country" multiple="multiple">
+                                    {% for item in country%}
+                                        <option value="{{item.country}}">{{item.country}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-12 col-lg-3 pl-2 pr-2">
+                                <span class="text-right">Track</span>
+                                <select class="form-control select2" id="sel_track" name="sel_track" multiple="multiple">
+                                    {% for item in tracks%}
+                                        <option value="{{item.track}}">{{item.track}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-12 col-lg-3 pl-2 pr-2">
+                                <span class="text-right">Race Name</span>
+                                <select class="form-control select2" id="sel_race_name" name="sel_race_name" multiple="multiple">
+                                    {% for item in race_names %}
+                                        <option value="{{item}}">{{item}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-12 col-lg-2 pl-2 pr-2">
+                                <span class="text-right">Race Class</span>
+                                <select class="form-control select2" id="sel_race_class" name="sel_race_class" multiple="multiple">
+                                    {% for item in race_classes%}
+                                        <option value="{{item.race_class}}">{{item.race_class}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-12 col-lg-2 pl-2 pr-2">
+                                <span class="text-right">Handicap Rating</span>
+                                <div class="ion-range-slider">
+                                    <input type="hidden" id="handicap_rating"/>
+                                </div>
+                            </div>
+                            <div class="col-12 col-lg-2 pl-2 pr-2">
+                                <span class="text-right">Age Class</span>
+                                <select class="form-control select2" id="sel_age_class" multiple="multiple" style="margin-top: 10px;">
+                                    {% for item in age_classes%}
+                                        <option value="{{item.age_class}}">{{item.value}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-12 col-lg-2 pl-2 pr-2">
+                                <span class="text-right">Distance</span>
+                                <div class="ion-range-slider">
+                                    <input type="hidden" id="distance"/>
+                                </div>
+                            </div>
+                            <div class="col-12 col-lg-3 pl-2 pr-2">
+                                <span class="text-right">Going</span>
+                                <select class="form-control select2" id="sel_going" name="sel_going" multiple="multiple">
+                                    {% for item in goings %}
+                                        <option value="{{item.going}}">{{item.going}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-12 col-lg-1 pl-2 pr-2">
+                                <span class="text-right">Total Runners</span>
+                                <div class="ion-range-slider">
+                                    <input type="hidden" id="total_runners"/>
+                                </div>
+                            </div>
+                            <div class="col-12 col-lg-2 pl-2 pr-2">
+                                <span class="text-right">Total Sp</span>
+                                <div class="ion-range-slider">
+                                    <input type="hidden" id="total_sp"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-12 col-lg-2 pl-2 pr-2">
+                                <span class="text-right">Horse Name</span>
+                                <input id="horse_name" type="text" class="form-control" placeholder="Search horsename"/>
+                            </div>
+                            <div class="col-12 col-lg-2 pl-2 pr-2">
+                                <span class="text-right">Horse Country</span>
+                                <select class="form-control select2" id="sel_horse_coutry" multiple="multiple">
+                                    {% for item in horse_countries %}
+                                        <option value="{{item.horse_country}}">{{item.horse_country}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-12 col-lg-2 pl-2 pr-2">
+                                <span class="text-right">Position</span>
+                                <select class="form-control select2" id="sel_position" multiple="multiple">
+                                    {% for item in positions %}
+                                        <option value="{{item.position}}">{{item.position}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-12 col-lg-1 pl-2 pr-2">
+                                <span class="text-right">Draw</span>
+                                <div class="ion-range-slider">
+                                    <input type="hidden" id="draw"/>
+                                </div>
+                            </div>
+                            <div class="col-12 col-lg-1 pl-2 pr-2">
+                                <span class="text-right">Horse Age</span>
+                                <div class="ion-range-slider">
+                                    <input type="hidden" id="horse_age"/>
+                                </div>
+                            </div>
+                            <div class="col-12 col-lg-2 pl-2 pr-2">
+                                <span class="text-right">Horse Birth Year</span>
+                                <select class="form-control select2" id="sel_birth_year" multiple="multiple">
+                                    {% for item in birth_years %}
+                                        <option value="{{item.birth_year}}">{{item.birth_year}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-12 col-lg-2 pl-2 pr-2">
+                                <span class="text-right">Horse Weight</span>
+                                <div class="ion-range-slider">
+                                    <input type="hidden" id="horse_weight"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-12 col-lg-2 pl-2 pr-2">
+                                <span class="text-right">Race Card Number</span>
+                                <div class="ion-range-slider">
+                                    <input type="hidden" id="racecard_number"/>
+                                </div>
+                            </div>
+                            <div class="col-12 col-lg-1 pl-2 pr-2">
+                                <span class="text-right">Horse Or</span>
+                                <div class="ion-range-slider">
+                                    <input type="hidden" id="horse_or"/>
+                                </div>
+                            </div>
+                            <div class="col-12 col-lg-1 pl-2 pr-2">
+                                <span class="text-right">Horse ts</span>
+                                <div class="ion-range-slider">
+                                    <input type="hidden" id="horse_ts"/>
+                                </div>
+                            </div>
+                            <div class="col-12 col-lg-1 pl-2 pr-2">
+                                <span class="text-right">Horse rpr</span>
+                                <div class="ion-range-slider">
+                                    <input type="hidden" id="horse_rpr"/>
+                                </div>
+                            </div>
+                            <div class="col-12 col-lg-2 pl-2 pr-2">
+                                <span class="text-right">Price Decimal</span>
+                                <div class="ion-range-slider">
+                                    <input type="hidden" id="price_decimal"/>
+                                </div>
+                            </div>
+                            <div class="col-12 col-lg-1 pl-2 pr-2">
+                                <span class="text-right">Price Symbol</span>
+                                <select class="form-control select2" id="sel_price_symbol" multiple="multiple">
+                                    {% for item in price_symbols %}
+                                        <option value="{{item.price_symbol}}">{{item.price_symbol}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-12 col-lg-2 pl-2 pr-2">
+                                <span class="text-right">Color</span>
+                                <select class="form-control select2" id="sel_color" multiple="multiple">
+                                    {% for item in colors %}
+                                        <option value="{{item.color}}">{{item.color}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-12 col-lg-2 pl-2 pr-2">
+                                <span class="text-right">Sex</span>
+                                <select class="form-control select2" id="sel_sex" multiple="multiple">
+                                    {% for item in sexs %}
+                                        <option value="{{item.sex}}">{{item.sex}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-12 col-lg-2 pl-2 pr-2">
+                                <span class="text-right">Jokey</span>
+                                <input id="horse_jockey" type="text" class="form-control" placeholder="Search jockey"/>
+                            </div>
+                            <div class="col-12 col-lg-2 pl-2 pr-2">
+                                <span class="text-right">Trainer</span>
+                                <input id="horse_trainer" type="text" class="form-control" placeholder="Search trainer"/>
+                            </div>
+                            <div class="col-12 col-lg-1 pl-2 pr-2">
+                                <span class="text-right">Sire</span>
+                                <input id="sire" type="text" class="form-control" placeholder="Search sire"/>
+                            </div>
+                            <div class="col-12 col-lg-2 pl-2 pr-2">
+                                <span class="text-right">Sire country</span>
+                                <select class="form-control select2" id="sel_sire_country" multiple="multiple">
+                                    {% for item in sire_countries %}
+                                        <option value="{{item.sire_country}}">{{item.sire_country}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-12 col-lg-1 pl-2 pr-2">
+                                <span class="text-right">Dam</span>
+                                <input id="dam" type="text" class="form-control" placeholder="Search dam"/>
+                            </div>
+                            <div class="col-12 col-lg-2 pl-2 pr-2">
+                                <span class="text-right">Dam Country</span>
+                                <select class="form-control select2" id="sel_dam_country" multiple="multiple">
+                                    {% for item in dam_countries %}
+                                        <option value="{{item.dam_country}}">{{item.dam_country}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-12 col-lg-2 pl-2 pr-2">
+                                <span class="text-right">DamSire</span>
+                                <input id="damsire" type="text" class="form-control" placeholder="Search damsire"/>
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-12 col-lg-1 pl-2 pr-2">
+                                <span class="text-right">Head Gear</span>
+                                <select class="form-control select2" id="sel_headgear" multiple="multiple">
+                                    {% for item in headgears %}
+                                        <option value="{{item.headgear}}">{{item.headgear}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-12 col-lg-2 pl-2 pr-2">
+                                <span class="text-right">Dist Upper</span>
+                                <div class="ion-range-slider">
+                                    <input type="hidden" id="dist_upper"/>
+                                </div>
+                            </div>
+                            <div class="col-12 col-lg-2 pl-2 pr-2">
+                                <span class="text-right">Dist Beaten</span>
+                                <div class="ion-range-slider">
+                                    <input type="hidden" id="dist_beaten"/>
+                                </div>
+                            </div>
+                            <div class="col-12 col-lg-2 pl-2 pr-2">
+                                <span class="text-right">Code</span>
+                                <select class="form-control select2" id="sel_marker" multiple="multiple" style="margin-top: 10px;">
+                                    {% for item in markers%}
+                                        <option value="{{item.marker}}">{{item.marker}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-12 col-lg-2 pl-2 pr-2">
+                                <span class="text-right">Free search</span>
+                                <input id="free_search" type="text" class="form-control" placeholder="Free Search"/>
+                            </div>
+                            <div class="col-12 col-lg-3 pl-2 pr-2 text-right">
+                                <br>
+                                <b id="btn_reset" class="btn btn-primary">
+                                    <i class="flaticon-refresh"></i> Reset
+                                </b>
+                                <b id="btn_query_search" class="btn btn-primary">
+                                    <i class="la la-download"></i> Query/Search
+                                </b>
+                                <b id="btn_search" class="btn btn-success">
+                                    <i class="fas fa-search"></i> Search
+                                </b>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--end::SearchOption-->
+        <div class="card card-custom gutter-b mt-4">
+            <div class="card-header pr-1">
+                <div class="card-title">
+                    <h3 class="card-label">Search Result</h3>
+                </div>
+                <div class="card-toolbar">
+                    <span id="txt_info" class="text-danger mr-4"></span>
+                    <button class="btn btn-primary mr-4" data-toggle="modal" data-target="#optionsDlg"><i class="la la-cog"></i>Export Options</button>
+                    <button id="btn_csv_query" class="btn btn-primary mr-4"><i class="la la-upload"></i>CSV Query</button>
+                    <input type="file" name="csv_file" id="csv_file" style="display: none;" accept=".csv">
+                    <button id="btn_export_csv" class="btn btn-primary mr-4"><i class="la la-download"></i>Export CSV</button>
+                </div>
+            </div>
+            <div class="card-body pt-1">
+                <table id="dataTable" class="table table-bordered table-hover table-head-custom dataTable dtr-inline pt-1" style="margin-top: 0px !important">
+                    <thead class="table-bordered">
+                        <tr>
+                            <th>Date</th>
+                            <th>Race Title</th>
+                            <th>Track<br><br>Winning Time / Var <br>Total Sp</th>
+                            <th>Race Name</th>
+                            <th>
+                                Race Class<br>
+                                Handicap Rating<br>
+                                Age Class<br>
+                                Distance<br>
+                                Going
+                            </th>
+                            <th>Prize</th>
+                            <th>
+                                Horse Name <br> Owner Name
+                            </th>
+                            <th>
+                                Earning - Position<br>
+                                Draw<br>
+                                Price<br><small>(Decimal - Fraction  Symbol)</small>
+                            </th>
+                            <th>
+                                Birthday<br>
+                                WGT<br>
+                                OR/TS/RPR<br>
+                                Color - Sex<br>
+                                <small class="font-weight-bold">Headgear </small>
+                            </th>
+                            <th>
+                                <small class="font-weight-bold">Race Card Number</small><br>
+                                Distance<br><small>(upper/beaten)</small><br>
+                                Price Var
+                            </th>
+                            <th>
+                                Jockey<br>
+                                Trainer
+                            </th>
+                            <th>Sire<br>Dam<br>DamSire</th>
+                            <th>Owner History</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- Reset Modal-->
+        <div class="modal fade" id="optionsDlg" data-backdrop="static" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Output Fields</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <i aria-hidden="true" class="ki ki-close"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body pt-2 pb-2">
+                        <div class="row">
+                            <div class="col-12 text-right">
+                                <label class="checkbox  checkbox-square checkbox-outline">
+                                    <input type="checkbox" id="checkAll" checked/> <h4>Select All</h4>
+                                    <span></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <h5 class="card-label">General</h5>
+                            </div>
+                        </div>
+                        <div class="row">
+                            {% for item in gen_field_list%}
+                                <div class="col-3 pb-2">
+                                    <label class="checkbox checkbox-square checkbox-outline chk_field">
+                                        <input class="chk_gen" type="checkbox" value="{{ item }}" {% if item in gen_field_uncheck_list %} {% else %}checked{% endif %}/> {{ item }}
+                                        <span></span>
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <div class="row pt-2">
+                            <div class="col-12">
+                                <h5 class="card-label">Player</h5>
+                            </div>
+                        </div>
+                        <div class="row">
+                            {% for item in player_field_list%}
+                                <div class="col-3 pb-2">
+                                    <label class="checkbox checkbox-square checkbox-outline chk_field">
+                                        <input class="chk_player" type="checkbox" value="{{ item }}" {% if item in player_field_uncheck_list %} {% else %}checked{% endif %}/> {{ item }}
+                                        <span></span>
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <div class="row pt-2">
+                            <div class="col-12">
+                                <h5 class="card-label">Horse</h5>
+                            </div>
+                        </div>
+                        <div class="row">
+                            {% for item in horse_field_list%}
+                                <div class="col-3 pb-2">
+                                    <label class="checkbox checkbox-square checkbox-outline">
+                                        <input class="chk_horse" type="checkbox" value="{{ item }}" {% if item in horse_field_uncheck_list %} {% else %}checked{% endif %}/> {{ item }}
+                                        <span></span>
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="btn_close" class="btn btn-light-primary font-weight-bold" data-dismiss="modal">Close</button>
+                        <!--<button id="btn_save" type="button" class="btn btn-primary font-weight-bold">Save changes</button>-->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Reset Modal-->
+    </div>
+    <!--end::Container-->
+{% endblock %}
+{% block javascript %}
+<script>
+    var arrows = {
+        leftArrow: '<i class="la la-angle-left"></i>',
+        rightArrow: '<i class="la la-angle-right"></i>'
+    }
+    var dt_start_date = $("#start_date").datepicker({
+        templates: arrows,
+        todayHighlight: true,
+        startDate: '{{ start_date }}',
+        format: 'yyyy-mm-dd'
+    }).on('changeDate', function(e) {
+        $("#start_date").datepicker('hide')
+    });
+    var dt_end_date = $("#end_date").datepicker({
+        templates: arrows,
+        todayHighlight: true,
+        endDate: new Date(),
+        format: 'yyyy-mm-dd'
+    }).on('changeDate', function(e) {
+        $("#end_date").datepicker('hide')
+    });
+    $('#sel_country').select2({
+        placeholder: "Select a country",
+    });
+    $('#sel_country').on('change', function (e) {
+        $.ajax({
+			headers: { "X-CSRFToken": '{{csrf_token}}' },
+			url: '{% url "ajax-get-track-by-country" %}',
+			data: {
+				'sel_country': $('#sel_country').val(),
+			},
+			type: 'POST',
+			success: function (data) {
+                var optionHtml = "";
+				data.tracks.forEach(function (item) {
+                    optionHtml+= `<option value="${item}">${item}</option>`
+                });
+                $('#sel_track').html(optionHtml);
+			}
+		});
+    });
+    $('#sel_track').select2({
+        placeholder: "Select a track",
+    });
+    $('#sel_race_name').select2({
+        placeholder: "Select a race name",
+    });
+    $('#sel_race_class').select2({
+        placeholder: "Select a race class",
+    });
+    $('#sel_birth_year').select2({
+        placeholder: "Select birth year",
+    });
+    $('#sel_age_class').select2({
+        placeholder: "Select a age class",
+    });
+    $('#sel_position').select2({
+        placeholder: "Select position",
+    });
+    $('#sel_going').select2({
+        placeholder: "Select a going",
+    });
+    $('#sel_horse_coutry').select2({
+        placeholder: "Select a horse country",
+    });
+    $('#sel_price_symbol').select2({
+        placeholder: "Select price symbol",
+    });
+    $('#sel_color').select2({
+        placeholder: "Select color",
+    });
+    $('#sel_sex').select2({
+        placeholder: "Select sex",
+    });
+    $('#sel_sire_country').select2({
+        placeholder: "Select sire country",
+    });
+    $('#sel_dam_country').select2({
+        placeholder: "Select dam country",
+    });
+    $('#sel_headgear').select2({
+        placeholder: "Select headgear",
+    });
+    $('#sel_marker').select2({
+        placeholder: "Select Code",
+    });
+
+    $('#handicap_rating').ionRangeSlider({
+        type: "double",
+        grid: true,
+        min: 0,
+        max: '{{max_handicap_rating}}',
+    });
+    var ion_handicap_rating = $('#handicap_rating').data("ionRangeSlider");
+    $('#distance').ionRangeSlider({
+        type: "double",
+        grid: true,
+        min: '{{min_distance}}',
+        max: '{{max_distance}}',
+        step: 0.001,
+    });
+    var ion_distance = $('#distance').data("ionRangeSlider");
+    $('#total_runners').ionRangeSlider({
+        type: "double",
+        grid: true,
+        min: '{{min_total_runners}}',
+        max: '{{max_total_runners}}',
+    });
+    var ion_total_runners = $('#total_runners').data("ionRangeSlider");
+    $('#total_sp').ionRangeSlider({
+        type: "double",
+        grid: true,
+        min: '{{min_total_sp}}',
+        max: '{{max_total_sp}}',
+    });
+    var ion_total_sp = $('#total_sp').data("ionRangeSlider");
+    $('#draw').ionRangeSlider({
+        type: "double",
+        grid: true,
+        min: '{{min_draw}}',
+        max: '{{max_draw}}',
+    });
+    var ion_draw = $('#draw').data("ionRangeSlider");
+    $('#horse_age').ionRangeSlider({
+        type: "double",
+        grid: true,
+        min: '{{min_horse_age}}',
+        max: '{{max_horse_age}}',
+    });
+    var ion_horse_age = $('#horse_age').data("ionRangeSlider");
+    $('#horse_weight').ionRangeSlider({
+        type: "double",
+        grid: true,
+        min: '{{min_horse_weight}}',
+        max: '{{max_horse_weight}}',
+    });
+    var ion_horse_weight = $('#horse_weight').data("ionRangeSlider");
+    $('#racecard_number').ionRangeSlider({
+        type: "double",
+        grid: true,
+        min: '{{min_racecard_number}}',
+        max: '{{max_racecard_number}}',
+    });
+    var ion_racecard_number = $('#racecard_number').data("ionRangeSlider");
+    $('#horse_or').ionRangeSlider({
+        type: "double",
+        grid: true,
+        min: '{{min_horse_or}}',
+        max: '{{max_horse_or}}',
+    });
+    var ion_horse_or = $('#horse_or').data("ionRangeSlider");
+    $('#horse_ts').ionRangeSlider({
+        type: "double",
+        grid: true,
+        min: '{{min_horse_ts}}',
+        max: '{{max_horse_ts}}',
+    });
+    var ion_horse_ts = $('#horse_ts').data("ionRangeSlider");
+    $('#horse_rpr').ionRangeSlider({
+        type: "double",
+        grid: true,
+        min: '{{min_horse_rpr}}',
+        max: '{{max_horse_rpr}}',
+    });
+    var ion_horse_rpr = $('#horse_rpr').data("ionRangeSlider");
+    $('#price_decimal').ionRangeSlider({
+        type: "double",
+        grid: true,
+        min: '{{min_price_decimal}}',
+        max: '{{max_price_decimal}}',
+        step: 0.001
+    });
+    var ion_price_decimal = $('#price_decimal').data("ionRangeSlider");
+    $('#dist_upper').ionRangeSlider({
+        type: "double",
+        grid: true,
+        min: '{{min_dist_upper}}',
+        max: '{{max_dist_upper}}',
+        step: 0.01
+    });
+    var ion_dist_upper = $('#dist_upper').data("ionRangeSlider");
+    $('#dist_beaten').ionRangeSlider({
+        type: "double",
+        grid: true,
+        min: '{{min_dist_beaten}}',
+        max: '{{max_dist_beaten}}',
+        step: 0.01
+    });
+    var ion_dist_beaten = $('#dist_beaten').data("ionRangeSlider");
+    var bFirst = true;
+    var disp_length = 0;
+    var selected_fields = [];
+    getSelectedFields();
+
+    var dtTable = $('#dataTable').DataTable({
+        processing: true,
+        responsive: true,
+        // scrollX: true,
+        // scrollCollapse: true,
+        serverSide: false,
+        deferLoading: false,
+        language: {
+            processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw bg-primary-o-10 text-primary"></i>'
+        },
+        ajax: {
+            "url": "{% url 'ajax-search-result' %}",
+            "headers": { "X-CSRFToken": '{{csrf_token}}' },
+            "type": 'POST',
+            "data": function ( d ) {
+                d.from_date =  $("#start_date").val(),
+                d.to_date = $("#end_date").val(),
+                // General LEVEL
+                d.sel_country = $("#sel_country").val(),
+                d.sel_track = $("#sel_track").val(),
+                d.sel_race_name = $("#sel_race_name").val(),
+                d.sel_race_class = $("#sel_race_class").val(),
+                d.sel_going = $("#sel_going").val(),
+                d.sel_age_class = $("#sel_age_class").val(),
+                d.sel_marker = $("#sel_marker").val(),
+                d.distance = $("#distance").val(),
+                d.total_runners = $("#total_runners").val(),
+                d.total_sp = $("#total_sp").val(),
+                d.handicap_rating = $("#handicap_rating").val(),
+                
+                // Horse LEVEL
+                d.horse_name = $("#horse_name").val(),
+                d.horse_country = $("#sel_horse_coutry").val(),
+                d.horse_jockey = $("#horse_jockey").val(),
+                d.horse_trainer = $("#horse_trainer").val(),
+                d.position = $("#sel_position").val(),
+                d.birth_year = $("#sel_birth_year").val(),
+                d.price_symbol = $("#sel_price_symbol").val(),
+                d.color = $("#sel_color").val(),
+                d.sex = $("#sel_sex").val(),
+                d.sire = $("#sire").val(),
+                d.sire_country = $("#sel_sire_country").val(),
+                d.dam = $("#dam").val(),
+                d.dam_country = $("#sel_dam_country").val(),
+                d.damsire = $("#damsire").val(),
+                d.headgear = $("#sel_headgear").val(),
+                d.draw = $("#draw").val(),
+                d.horse_age = $("#horse_age").val(),
+                d.horse_weight = $("#horse_weight").val(),
+                d.racecard_number = $("#racecard_number").val(),
+                d.horse_or = $("#horse_or").val(),
+                d.horse_ts = $("#horse_ts").val(),
+                d.horse_rpr = $("#horse_rpr").val(),
+                d.price_decimal = $("#price_decimal").val(),
+                d.dist_upper = $("#dist_upper").val(),
+                d.dist_beaten = $("#dist_beaten").val(),
+
+                d.free_search = $("#free_search").val(),
+                d.b_first = bFirst
+            },
+            "dataSrc": function ( json ) {
+                //Make your callback here.
+                console.log(json.all_length)
+                disp_length = json.all_length;
+                if(json.all_length >= 1000){
+                    $("#txt_info").html(`There are ${json.all_length} search result, Please give full query for improving speed!`);
+                }else{
+                    $("#txt_info").html("");
+                }
+                
+                return json.data;
+            } 
+        },
+        columns: [
+            { "data": "racing.sdate" },
+            { "data": "racing.race_title" },
+            { "data": "racing.track" },
+            { "data": "racing.race_name" },
+            { "data": "racing.race_class" },
+            { "data": "racing.prize" },
+            { "data": "horse_name" },
+            { "data": "prize_money" },
+            { "data": "horse_age" },
+            { "data": "dist_upper" },
+            { "data": "horse_jockey" },
+            { "data": "sire" },
+            { "data": "horse.owner_history" },
+            
+        ],
+        columnDefs: [
+            { 
+                width: '4%', 
+                targets: 0,
+                "render": function ( data, type, row ){
+                    return data.replaceAll('-', '/') + " " + row["racing"]["stime"].substring(0, 5);
+                },
+            },
+            { 
+                width: '9%', 
+                targets: 1,
+                "render": function ( data, type, row ){
+                    return "<a href='" + row["racing"]["link"] + "'>" + row["racing"]["race_title"] + "</a>";
+                }, 
+            },
+            {
+                width: '8%',
+                targets: 2,
+                "render": function ( data, type, row ){
+                    var tmpHtml = "";
+                    if (row["racing"]["country"] == "UK"){
+                        tmpHtml = `<span>${data}</span><i class="ml-1 flag-icon flag-icon-gb float-right" title="${row["racing"]["country"]}"></i><br>`
+                    }else{
+                        tmpHtml = `<span>${data}</span><i class="ml-1 flag-icon flag-icon-ie float-right" title="${row["racing"]["country"]}"></i><br>`
+                    }
+                    tmpHtml += '<br>';
+                    if (row["racing"]["marker"] == "All Other"){
+                        tmpHtml +=  `<span class="label label-lg font-weight-bold  label-light-warning label-inline">${row["racing"]["marker"]}</span>`
+                    }else if (data == "Flat"){
+                        tmpHtml += `<span class="label label-lg font-weight-bold  label-light-primary label-inline">${row["racing"]["marker"]}</span>`
+                    }else{
+                        tmpHtml += `<span class="label label-lg font-weight-bold  label-light-success label-inline">${row["racing"]["marker"]}</span>`
+                    }
+                    tmpHtml += `<span class="mr-2 float-right font-weight-bold text-info"><i class="la la-running mr-2 text-primary"></i>${row["racing"]["total_runners"]}</span>`;
+                    tmpHtml += `<br><span class="mr-2 float-right">${row["racing"]["winning_time"]} / ${row["racing"]["winning_timevar"]}</span>`;
+                    tmpHtml += `<br><span class="mr-2 float-right text-success">sp: ${row["racing"]["total_sp"]}</span>`;
+                    return tmpHtml;
+                }, 
+            },
+            { 
+                width: '6%', 
+                targets: 3,
+                "render": function ( data, type, row ){
+                    var raceNameHtml = "";
+                    var temp = data.split(";")
+                    temp.forEach(function(item){
+                        raceNameHtml += item + '<br>';
+                    })
+                    return raceNameHtml;
+                }, 
+            },
+            { 
+                width: '6%', 
+                targets: 4,
+                "render": function ( data, type, row ){
+                    var tmpHtml = "";
+                    tmpHtml = `${data}<br>`;
+                    tmpHtml += `${row["racing"]["handicap_rating"]}<br>`;
+                    tmpHtml += `${row["racing"]["age_class"]}<br>`;
+                    tmpHtml += `${row["racing"]["distance"]}<br>`;
+                    tmpHtml += `${row["racing"]["going"]}<br>`;
+                    return tmpHtml;
+                }, 
+            },
+            { 
+                width: '6%', 
+                targets: 5,
+                "render": function ( data, type, row ){
+                    var raceNameHtml = "";
+                    var temp = data.split(";")
+                    temp.forEach(function(item){
+                        raceNameHtml += item + '<br>';
+                    })
+                    return raceNameHtml;
+                }, 
+            },
+            { 
+                width: '9%', 
+                targets: 6,
+                "render": function ( data, type, row ){
+                    var tmpHtml = `<br><br><i class="la la-user mr-3"></i><span class="text-success">${row["horse"]["owner"]}</span>`
+                    return `<i class="la fab la-sticker-mule mr-3"></i><span class="font-weight-bold">${data}</span><span class="float-right font-weight-bold text-danger">${row["horse_country"]}</span>${tmpHtml}`;
+                }, 
+            },
+            {
+                width: '5%',
+                targets: 7,
+                "render": function ( data, type, row ){
+                    var positionHtml;
+                    if (row['position'] == "1" || row['position'] == "2" || row['position'] == "3"){
+                        positionHtml = `<span class="float-right label pulse pulse-primary label-primary"><span class="position-relative">${row['position']}</span><span class="pulse-ring"></span></span>`;
+                    }else{
+                        positionHtml = `<span class="float-right label label-primary">${row['position']}</span>`;
+                    }
+                    positionHtml = `${row['prize_currency']} ${data} ${positionHtml}<br>`
+                    positionHtml += `<i class="la la-compass mr-3 text-primary"></i>${row['draw_index']}<br>`;
+                    positionHtml += `<i class="la la-comments-dollar mr-3 text-primary"></i>${parseFloat(row['price_decimal'].toFixed(3))} - ${row['price_fraction']} <span class="float-right font-weight-bold text-info">${row['price_symbol']}</span>`;
+                    return positionHtml;
+                }, 
+            },
+            {
+                width: '8%',
+                targets: 8,
+                "render": function ( data, type, row ){
+                    var tmpHtml = `<i class="la la-calendar mr-3 text-primary"></i>${row['birth_date']} <span class="float-right label pulse pulse-danger label-primary"><span class="position-relative">${row['horse_age']}</span><span class="pulse-ring"></span></span><br>`;
+                    tmpHtml += `<i class="la la-balance-scale mr-3 text-primary"></i>${row['horse_weight']}<br>`;
+                    tmpHtml += `<i class="la la-democrat mr-3 text-primary"></i>${row['horse_or']} / ${row['horse_ts']} / ${row['horse_rpr']}<br>`;
+                    tmpHtml += `<i class="la fab la-delicious mr-3 text-primary"></i><span class="font-weight-bold text-primary">${row['color']}</span> <span class="mr-2 float-right font-weight-bold text-info"><i class="la la-intersex mr-3 text-primary"></i>${row['sex']}</span><br>`;
+                    tmpHtml += `<i class="la la-horse-head mr-3 text-primary"></i><span class="font-weight-bold ml-2">${row['headgear']}</span>  `;
+                    return tmpHtml;
+                },
+            },
+            { 
+                width: '6%', 
+                targets: 9,
+                "render": function ( data, type, row ){
+                    return `<i class="la la-sort-numeric-down mr-3 text-primary"></i>${row['racecard_number']}<br><i class="la la-running mr-3 text-primary"></i>${row['dist_upper']}/${row['dist_beaten']}<br><i class="la la-comment-dollar mr-3 text-primary"></i>${row['price_var']}`;
+                }, 
+            },
+            { 
+                width: '9%', 
+                targets: 10,
+                "render": function ( data, type, row ){
+                    return `<span class="font-weight-bold">${data}</span> <br> <span class="font-weight-bold  text-success">${row['horse_trainer']}</span>`;
+                }, 
+            },
+            {
+                width: '8%', 
+                targets: 11,
+                "render": function ( data, type, row ){
+                    return `${row['sire']}  <span class="mr-2 float-right font-weight-bold text-danger">${row['sire_country']}</span> <br><span class="text-success">${row['dam']}</span> <span class="mr-2 float-right font-weight-bold text-success">${row['dam_country']}</span><br>${row["damsire"]}`;
+                }, 
+            },
+            {
+                width: '15%', 
+                targets: 12,
+                "render": function ( data, type, row ){
+                    var raceNameHtml = "";
+                    var temp = data.split(",")
+                    temp.forEach(function(item){
+                        raceNameHtml += item + '<br>';
+                    })
+                    return raceNameHtml;
+                }, 
+            }
+        ],
+        
+    });
+    $('#btn_search').on('click', function(){
+        bFirst = false;
+        $(this).html(' Search');
+        $(this).addClass('spinner spinner-darker-light spinner-left mr-3');
+        dtTable.ajax.reload(function(){
+            $('#btn_search').removeClass('spinner spinner-darker-light spinner-left mr-3');
+            $('#btn_search').html('<i class="fas fa-search"></i> Search');
+        }, false);
+        
+    });
+    $('#btn_reset').on('click', function(){
+        $("#start_date").datepicker('setDate', '{{ start_date }}');
+        $("#end_date").datepicker('setDate', '{{ end_date }}');
+
+        $('#sel_country').val(null).val(null).trigger('change');
+        $('#sel_track').val(null).trigger('change');
+        $('#sel_race_name').val(null).trigger('change');
+        $('#sel_going').val(null).trigger('change');
+        $('#sel_age_class').val(null).trigger('change');
+        $('#sel_race_class').val(null).trigger('change');
+        $('#sel_marker').val(null).trigger('change');
+        $("#sel_horse_coutry").val(null).trigger('change');
+        $("#sel_position").val(null).trigger('change');
+        $("#sel_birth_year").val(null).trigger('change');
+        $("#sel_price_symbol").val(null).trigger('change');
+        $("#sel_color").val(null).trigger('change');
+        $("#sel_sex").val(null).trigger('change');
+        $("#sel_sire_country").val(null).trigger('change');
+        $("#sel_dam_country").val(null).trigger('change');
+        $("#sel_headgear").val(null).trigger('change');
+
+        $("#horse_name").val('');
+        $("#horse_jockey").val('');
+        $("#horse_trainer").val('');
+        $("#sire").val('');
+        $("#dam").val('');
+        $("#damsire").val('');
+        $("#free_search").val('');
+
+        ion_handicap_rating.reset();
+        ion_distance.reset();
+        ion_dist_beaten.reset();
+        ion_dist_upper.reset();
+        ion_draw.reset();
+        ion_horse_age.reset();
+        ion_horse_or.reset();
+        ion_horse_rpr.reset();
+        ion_horse_ts.reset();
+        ion_horse_weight.reset();
+        ion_price_decimal.reset();
+        ion_racecard_number.reset();
+        ion_total_runners.reset();
+        ion_total_sp.reset();
+        dtTable.clear().draw();
+    });
+    $("#btn_query_search").on('click', function(e){
+        $(this).html(' Query/Search');
+        $(this).addClass('spinner spinner-darker-light spinner-left mr-3');
+        $.ajax({
+            headers: { "X-CSRFToken": '{{csrf_token}}' },
+            url: '{% url "ajax-export-csv" %}',
+            data: {
+                from_date :  $("#start_date").val(),
+                to_date : $("#end_date").val(),
+                // General LEVEL
+                sel_country : $("#sel_country").val(),
+                sel_track : $("#sel_track").val(),
+                sel_race_name : $("#sel_race_name").val(),
+                sel_race_class : $("#sel_race_class").val(),
+                sel_going : $("#sel_going").val(),
+                sel_age_class : $("#sel_age_class").val(),
+                sel_marker : $("#sel_marker").val(),
+                distance : $("#distance").val(),
+                total_runners : $("#total_runners").val(),
+                total_sp : $("#total_sp").val(),
+                handicap_rating : $("#handicap_rating").val(),
+                
+                // Horse LEVEL
+                horse_name : $("#horse_name").val(),
+                horse_country : $("#sel_horse_coutry").val(),
+                horse_jockey : $("#horse_jockey").val(),
+                horse_trainer : $("#horse_trainer").val(),
+                position : $("#sel_position").val(),
+                birth_year : $("#sel_birth_year").val(),
+                price_symbol : $("#sel_price_symbol").val(),
+                color : $("#sel_color").val(),
+                sex : $("#sel_sex").val(),
+                sire : $("#sire").val(),
+                sire_country : $("#sel_sire_country").val(),
+                dam : $("#dam").val(),
+                dam_country : $("#sel_dam_country").val(),
+                damsire : $("#damsire").val(),
+                headgear : $("#sel_headgear").val(),
+                draw : $("#draw").val(),
+                horse_age : $("#horse_age").val(),
+                horse_weight : $("#horse_weight").val(),
+                racecard_number : $("#racecard_number").val(),
+                horse_or : $("#horse_or").val(),
+                horse_ts : $("#horse_ts").val(),
+                horse_rpr : $("#horse_rpr").val(),
+                price_decimal : $("#price_decimal").val(),
+                dist_upper : $("#dist_upper").val(),
+                dist_beaten : $("#dist_beaten").val(),
+
+                free_search : $("#free_search").val(),
+                selected_fields: selected_fields.join()
+            },
+            type: 'POST',
+            success: function (data) {
+                $('#btn_query_search').removeClass('spinner spinner-darker-light spinner-left mr-3');
+                $('#btn_query_search').html('<i class="la la-download"></i> Query Search');
+                var blob = new Blob([data], { type: "application/octetstream" });
+                fileName = "Search_result.csv";
+                //Check the Browser type and download the File.
+                var isIE = false || !!document.documentMode;
+                if (isIE) {
+                    window.navigator.msSaveBlob(blob, fileName);
+                } else {
+                    var url = window.URL || window.webkitURL;
+                    link = url.createObjectURL(blob);
+                    var a = $("<a />");
+                    a.attr("download", fileName);
+                    a.attr("href", link);
+                    $("body").append(a);
+                    a[0].click();
+                    $("body").remove(a);
+                }
+            }
+        });
+    });
+
+    $("#btn_export_csv").on('click', function(e){
+        if (disp_length == 0){
+            return;
+        }
+        $(this).html(' Export CSV');
+        $(this).addClass('spinner spinner-darker-light spinner-left mr-3');
+        $.ajax({
+            headers: { "X-CSRFToken": '{{csrf_token}}' },
+            url: '{% url "ajax-export-csv" %}',
+            data: {
+                from_date :  $("#start_date").val(),
+                to_date : $("#end_date").val(),
+                // General LEVEL
+                sel_country : $("#sel_country").val(),
+                sel_track : $("#sel_track").val(),
+                sel_race_name : $("#sel_race_name").val(),
+                sel_race_class : $("#sel_race_class").val(),
+                sel_going : $("#sel_going").val(),
+                sel_age_class : $("#sel_age_class").val(),
+                sel_marker : $("#sel_marker").val(),
+                distance : $("#distance").val(),
+                total_runners : $("#total_runners").val(),
+                total_sp : $("#total_sp").val(),
+                handicap_rating : $("#handicap_rating").val(),
+                
+                // Horse LEVEL
+                horse_name : $("#horse_name").val(),
+                horse_country : $("#sel_horse_coutry").val(),
+                horse_jockey : $("#horse_jockey").val(),
+                horse_trainer : $("#horse_trainer").val(),
+                position : $("#sel_position").val(),
+                birth_year : $("#sel_birth_year").val(),
+                price_symbol : $("#sel_price_symbol").val(),
+                color : $("#sel_color").val(),
+                sex : $("#sel_sex").val(),
+                sire : $("#sire").val(),
+                sire_country : $("#sel_sire_country").val(),
+                dam : $("#dam").val(),
+                dam_country : $("#sel_dam_country").val(),
+                damsire : $("#damsire").val(),
+                headgear : $("#sel_headgear").val(),
+                draw : $("#draw").val(),
+                horse_age : $("#horse_age").val(),
+                horse_weight : $("#horse_weight").val(),
+                racecard_number : $("#racecard_number").val(),
+                horse_or : $("#horse_or").val(),
+                horse_ts : $("#horse_ts").val(),
+                horse_rpr : $("#horse_rpr").val(),
+                price_decimal : $("#price_decimal").val(),
+                dist_upper : $("#dist_upper").val(),
+                dist_beaten : $("#dist_beaten").val(),
+
+                free_search : $("#free_search").val(),
+                selected_fields: selected_fields.join()
+            },
+            type: 'POST',
+            success: function (data) {
+                $('#btn_export_csv').removeClass('spinner spinner-darker-light spinner-left mr-3');
+                $('#btn_export_csv').html('<i class="la la-download"></i> Export CSV');
+                var blob = new Blob([data], { type: "application/octetstream" });
+                fileName = "Search_result.csv";
+                //Check the Browser type and download the File.
+                var isIE = false || !!document.documentMode;
+                if (isIE) {
+                    window.navigator.msSaveBlob(blob, fileName);
+                } else {
+                    var url = window.URL || window.webkitURL;
+                    link = url.createObjectURL(blob);
+                    var a = $("<a />");
+                    a.attr("download", fileName);
+                    a.attr("href", link);
+                    $("body").append(a);
+                    a[0].click();
+                    $("body").remove(a);
+                }
+            }
+        });
+    })
+    $("#checkAll").click(function(){
+        $('input:checkbox').not(this).prop('checked', this.checked);
+    });
+    $("#btn_close").on('click', function(){
+        getSelectedFields();
+    });
+    function getSelectedFields(){
+        selected_fields = [];
+        $('input[class="chk_gen"]:checked').each(function() {
+            selected_fields.push("racing__" + this.value); 
+        });
+        $('input[class="chk_player"]:checked').each(function() {
+            selected_fields.push(this.value); 
+        });
+        $('input[class="chk_horse"]:checked').each(function() {
+            selected_fields.push("horse__" + this.value); 
+        });
+    }
+    $("#btn_csv_query").on('click', function(){
+        $("#csv_file").click();
+    });
+    $("#csv_file").on('change', function(event){
+        $("#btn_csv_query").html(' CSV Query');
+        $("#btn_csv_query").addClass('spinner spinner-darker-light spinner-left mr-3');
+
+        var inputFile = event.currentTarget;
+        var file_name = inputFile.files[0].name;
+
+        if (inputFile.files.length > 0){
+            console.log('starting csv query');
+            var file_data = $('#csv_file').prop('files')[0];   
+            var form_data = new FormData();                  
+            form_data.append('file', file_data);
+            form_data.append('selected_fields', selected_fields.join());
+            // Search options
+            form_data.append('from_date', $("#start_date").val());
+            form_data.append('to_date', $("#end_date").val());
+            // General LEVEL
+            form_data.append('sel_country', $("#sel_country").val());
+            form_data.append('sel_track', $("#sel_track").val());
+            form_data.append('sel_race_name', $("#sel_race_name").val());
+            form_data.append('sel_race_class', $("#sel_race_class").val());
+            form_data.append('sel_going', $("#sel_going").val());
+            form_data.append('sel_age_class', $("#sel_age_class").val());
+            form_data.append('sel_marker', $("#sel_marker").val());
+            form_data.append('distance', $("#distance").val());
+            form_data.append('total_runners', $("#total_runners").val());
+            form_data.append('total_sp', $("#total_sp").val());
+            form_data.append('handicap_rating', $("#handicap_rating").val());
+            // Horse LEVEL
+            form_data.append('horse_name', $("#horse_name").val());
+            form_data.append('horse_country', $("#sel_horse_coutry").val());
+            form_data.append('horse_jockey', $("#horse_jockey").val());
+            form_data.append('horse_trainer', $("#horse_trainer").val());
+            form_data.append('position', $("#sel_position").val());
+            form_data.append('birth_year', $("#sel_birth_year").val());
+            form_data.append('price_symbol', $("#sel_price_symbol").val());
+            form_data.append('color', $("#sel_color").val());
+            form_data.append('sex', $("#sel_sex").val());
+            form_data.append('sire', $("#sire").val());
+            form_data.append('sire_country', $("#sel_sire_country").val());
+            form_data.append('dam', $("#dam").val());
+            form_data.append('dam_country', $("#sel_dam_country").val());
+            form_data.append('damsire', $("#damsire").val());
+            form_data.append('headgear', $("#sel_headgear").val());
+            form_data.append('draw', $("#draw").val());
+            form_data.append('horse_age', $("#horse_age").val());
+            form_data.append('horse_weight', $("#horse_weight").val());
+            form_data.append('racecard_number', $("#racecard_number").val());
+            form_data.append('horse_or', $("#horse_or").val());
+            form_data.append('horse_ts', $("#horse_ts").val());
+            form_data.append('horse_rpr', $("#horse_rpr").val());
+            form_data.append('price_decimal', $("#price_decimal").val());
+            form_data.append('dist_upper', $("#dist_upper").val());
+            form_data.append('dist_beaten', $("#dist_beaten").val());
+            form_data.append('free_search', $("#free_search").val());
+            
+            $.ajax({
+                headers:{ 'X-CSRFToken': "{{csrf_token}}" },
+                url: "{% url 'ajax-csv-query' %}",
+                type: 'POST',
+                data: form_data,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function (data) {
+                    $("#csv_file").val("");
+                    $("#btn_csv_query").removeClass('spinner spinner-darker-light spinner-left mr-3');
+                    $("#btn_csv_query").html('<i class="la la-upload"></i> CSV Query');
+                    var blob = new Blob([data], { type: "application/octetstream" });
+                    fileName = file_name.replace('Q', '');
+                    //Check the Browser type and download the File.
+                    var isIE = false || !!document.documentMode;
+                    if (isIE) {
+                        window.navigator.msSaveBlob(blob, fileName);
+                    } else {
+                        var url = window.URL || window.webkitURL;
+                        link = url.createObjectURL(blob);
+                        var a = $("<a />");
+                        a.attr("download", fileName);
+                        a.attr("href", link);
+                        $("body").append(a);
+                        a[0].click();
+                        $("body").remove(a);
+                    }
+                }
+            });
+        }
+    });
+</script>
+
+{% endblock %}

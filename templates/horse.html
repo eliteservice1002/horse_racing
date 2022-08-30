@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+{% block css%}
+    
+{% endblock %}
+{% block content %}
+    <!--begin::Container-->
+    <div class="container">
+        <div class="card card-custom gutter-b">
+            <div class="card-header pr-1 w-100">
+                <div class="card-title">
+                    <h3 class="card-label">Owner History List</h3>
+                </div>
+                <div class="card-toolbar col-12 col-lg-10 pr-2">
+                    <div class="row w-100">
+                        <div class="col-12 col-lg-8">
+                            <div class="row">
+                                <div class="col-12 col-lg-4 pl-1 pr-1">
+                                    <span class="text-right">Horse Name</span>
+                                    <input id="horse_name" type="text" class="form-control" placeholder="Search horse name"/>
+                                </div>
+                                <div class="col-12 col-lg-4 pl-1 pr-1">
+                                    <span class="text-right">Owner Name</span>
+                                    <input id="owner_name" type="text" class="form-control" placeholder="Search owner name"/>
+                                </div>
+                                <div class="col-12 col-lg-4 pl-1 pr-1">
+                                    <span class="text-right">Owner Name in History</span>
+                                    <input id="owner_history_name" type="text" class="form-control" placeholder="Search owner name in history"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-4">
+                            <div class="row float-right" >
+                                <div class="col-12 col-lg-4 pl-1 pr-1">
+                                    <span class="text-right">From</span>
+                                    <input id="start_date" type="text" class="form-control" readonly="readonly" placeholder="Select date" value="{{ from_date }}"/>
+                                </div>
+                                <div class="col-12 col-lg-4 pl-1 pr-1">
+                                    <span class="text-right">To</span>
+                                    <input  id="end_date"  type="text" class="form-control" readonly="readonly" placeholder="Select date" value="{{ to_date }}"/>
+                                </div>
+                                <div class="col-12 col-lg-4 pl-1 pr-1 text-right">
+                                    <br>
+                                    <b id="btn_search" class="btn btn-success">
+                                        <i class="fas fa-search"></i> Search
+                                    </b>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row w-100">
+                        <div class="col-12">
+                            <span id="txt_info" class="text-danger mr-4  float-right" style="display: none;"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body pt-1">
+                <table id="dataTable" class="table table-separate table-hover table-head-custom dataTable dtr-inline mt-0">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Birthday</th>
+                            <th>Owner</th>
+                            <th>Owner History</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!--end::Container-->
+{% endblock %}
+{% block javascript %}
+    <script>
+        var bClickable = true;
+        var arrows = {
+            leftArrow: '<i class="la la-angle-left"></i>',
+            rightArrow: '<i class="la la-angle-right"></i>'
+        }
+        $("#start_date").datepicker({
+            templates: arrows,
+            todayHighlight: true,
+            startDate: '{{ start_date }}',
+            format: 'yyyy-mm-dd'
+        }).on('changeDate', function(e) {
+            $("#start_date").datepicker('hide')
+        });
+        $("#end_date").datepicker({
+            templates: arrows,
+            todayHighlight: true,
+            endDate: new Date(),
+            format: 'yyyy-mm-dd'
+        }).on('changeDate', function(e) {
+            $("#end_date").datepicker('hide')
+        });
+
+        $('#btn_search').on('click', function(){
+            if (bClickable){
+                bClickable = false;
+                $(this).html(' Search');
+                $(this).addClass('spinner spinner-darker-light spinner-left mr-3');
+                dtTable.ajax.reload(function(){
+                    bClickable = true;
+                    $('#btn_search').removeClass('spinner spinner-darker-light spinner-left mr-3');
+                    $('#btn_search').html('<i class="fas fa-search"></i> Search');
+                }, false);
+            }
+            
+        });
+        var dtTable = $('#dataTable').DataTable({
+            processing: true,
+            responsive: true,
+            language: {
+                processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw bg-primary-o-10 text-primary"></i>'
+            },
+            ajax: {
+                "url": "{% url 'ajax-get-horse' %}",
+                "headers": { "X-CSRFToken": '{{csrf_token}}' },
+                "type": 'POST',
+                "data": function ( d ) {
+                    d.from_date =  $("#start_date").val(),
+                    d.to_date = $("#end_date").val(),
+                    d.horse_name = $("#horse_name").val(),
+                    d.owner_name = $("#owner_name").val(),
+                    d.owner_history_name = $("#owner_history_name").val()
+                },
+                "dataSrc": function ( json ) {
+                    if(json.all_length >= 3000){
+                        $("#txt_info").html(`There are ${json.all_length} search result, Please give full query for improving speed!`);
+                        $("#txt_info").show();
+                    }else{
+                        $("#txt_info").html("");
+                        $("#txt_info").hide();
+                    }
+                    return json.data;
+                } 
+            },
+            columns: [
+                { "data": "horse_name" },
+                { "data": "birth_date" },
+                { "data": "owner" },
+                { "data": "owner_history" }
+            ],
+            columnDefs: [
+                { 
+                    width: '13%', 
+                    targets: 0,
+                    "render": function ( data, type, row ){
+                        return "<a href='" + row["link"] + "'>" + row["horse_name"] + "</a>";
+                    },  
+                },
+                { 
+                    targets: 3,
+                    "render": function ( data, type, row ){
+                        var raceNameHtml = "";
+                        var temp = row["owner_history"].split(",")
+                        temp.forEach(function(item){
+                            raceNameHtml += item + '<br>';
+                        })
+                        return raceNameHtml;
+                    }, 
+                },
+                
+                
+            ],
+        });
+    </script>
+{% endblock %}

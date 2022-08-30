@@ -1,0 +1,330 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+{% block css%}
+    <style>
+        th{
+            padding-left: 1px ! important;
+            padding-right: 4px ! important;
+            padding-top: 2px ! important;
+            padding-bottom: 2px ! important;
+        }
+        td{
+            padding-left: 3px ! important;
+            padding-right: 3px ! important;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <!--begin::Container-->
+    <div class="container-fluid">
+        <div class="card card-custom gutter-b">
+            <div class="card-header pr-1">
+                <div class="card-title">
+                    <h3 class="card-label">Players List</h3>
+                </div>
+                <div class="card-toolbar col-12 col-lg-11 pr-2">
+                    <div class="row w-100">
+                        <div class="col-12 col-lg-4">
+                            <div class="row">
+                                <div class="col-12 col-lg-4 pl-1 pr-1">
+                                    <span class="text-right">Horse Name</span>
+                                    <input id="horse_name" type="text" class="form-control" placeholder="Search horsename"/>
+                                </div>
+                                <div class="col-12 col-lg-4 pl-1 pr-1">
+                                    <span class="text-right">Jokey</span>
+                                    <input id="horse_jockey" type="text" class="form-control" placeholder="Search jockey"/>
+                                </div>
+                                <div class="col-12 col-lg-4 pl-1 pr-1">
+                                    <span class="text-right">Trainer</span>
+                                    <input id="horse_trainer" type="text" class="form-control" placeholder="Search trainer"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-4">
+                            <div class="row">
+                                <div class="col-12 col-lg-4 pl-1 pr-1">
+                                    <span class="text-right">Sire</span>
+                                    <input id="sire" type="text" class="form-control" placeholder="Search sire"/>
+                                </div>
+                                <div class="col-12 col-lg-4 pl-1 pr-1">
+                                    <span class="text-right">Dam</span>
+                                    <input id="dam" type="text" class="form-control" placeholder="Search dam"/>
+                                </div>
+                                <div class="col-12 col-lg-4 pl-1 pr-1">
+                                    <span class="text-right">DamSire</span>
+                                    <input id="damsire" type="text" class="form-control" placeholder="Search damsire"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-4">
+                            <div class="row" >
+                                <div class="col-12 col-lg-5 pl-1 pr-1">
+                                    <span class="text-right">Horse Country</span>
+                                    <select class="form-control select2" id="sel_horse_coutry" multiple="multiple">
+                                        {% for item in horse_countries %}
+                                            <option value="{{item.horse_country}}">{{item.horse_country}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-12 col-lg-2 pl-1 pr-1">
+                                    <span class="text-right">From</span>
+                                    <input id="start_date" type="text" class="form-control pl-1 pr-1" readonly="readonly" placeholder="Select date" value="{{ from_date }}"/>
+                                </div>
+                                <div class="col-12 col-lg-2 pl-1 pr-1">
+                                    <span class="text-right">To</span>
+                                    <input  id="end_date"  type="text" class="form-control pl-1 pr-1" readonly="readonly" placeholder="Select date" value="{{ to_date }}"/>
+                                </div>
+                                <div class="col-12 col-lg-3 pl-1 pr-1 text-center">
+                                    <br>
+                                    <b id="btn_search" class="btn btn-success">
+                                        <i class="fas fa-search"></i> Search
+                                    </b>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row w-100">
+                        <div class="col-12">
+                            <span id="txt_info" class="text-danger mr-4  float-right" style="display: none;"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body pt-1">
+                <table id="dataTable" class="table table-bordered table-hover table-head-custom dataTable dtr-inline pt-1" style="margin-top: 0px !important">
+                    <thead class="table-bordered">
+                        <tr>
+                            <th colspan="1" rowspan="2">Date</th>
+                            <th colspan="1" rowspan="2">Horse Name</th>
+                            <th colspan="1" rowspan="2">Earning</th>
+                            <th colspan="1" rowspan="2">Draw</th>
+                            <th colspan="1" rowspan="2">Price<br><small>(Decimal <br> Fraction <br> Symbol)</small></th>
+                            <th colspan="7" rowspan="1">Horse Infomation</th>
+                            <th colspan="1" rowspan="2">Distance<br><small>upper/beaten</small></th>
+                            <th colspan="1" rowspan="2"><small class="font-weight-bold">Race Card Number</small></th>
+                            <th colspan="1" rowspan="2"><small class="font-weight-bold">Price Var</small></th>
+                            <th colspan="1" rowspan="2">Sire</th>
+                            <th colspan="1" rowspan="2">Dam</th>
+                            <th colspan="1" rowspan="2">Damsire</th>
+                        </tr>
+                        <tr>
+                            <th>Birthday</th>
+                            <th>WGT</th>
+                            <th>OR/TS/RPR</th>
+                            <th>Jockey</th>
+                            <th>Trainer</th>
+                            <th>Color Sex</th>
+                            <th><small class="font-weight-bold">Headgear  Wind_12</small></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!--end::Container-->
+{% endblock %}
+{% block javascript %}
+    <script>
+        var bClickable = true;
+        var arrows = {
+            leftArrow: '<i class="la la-angle-left"></i>',
+            rightArrow: '<i class="la la-angle-right"></i>'
+        }
+        $("#start_date").datepicker({
+            templates: arrows,
+            todayHighlight: true,
+            startDate: '{{ start_date }}',
+            format: 'yyyy-mm-dd'
+        }).on('changeDate', function(e) {
+            $("#start_date").datepicker('hide')
+        });
+        $("#end_date").datepicker({
+            templates: arrows,
+            todayHighlight: true,
+            endDate: new Date(),
+            format: 'yyyy-mm-dd'
+        }).on('changeDate', function(e) {
+            $("#end_date").datepicker('hide')
+        });
+        $('#sel_horse_coutry').select2({
+            placeholder: "Select a horse country",
+        });
+        
+        $('#btn_search').on('click', function(){
+            if (bClickable){
+                bClickable = false;
+                $(this).html(' Search');
+                $(this).addClass('spinner spinner-darker-light spinner-left mr-3');
+                dtTable.ajax.reload(function(){
+                    bClickable = true;
+                    $('#btn_search').removeClass('spinner spinner-darker-light spinner-left mr-3');
+                    $('#btn_search').html('<i class="fas fa-search"></i> Search');
+                }, false);
+            }
+        })
+        var dtTable = $('#dataTable').DataTable({
+            processing: true,
+            responsive: true,
+            // scrollX: true,
+            // scrollCollapse: true,
+            language: {
+                processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw bg-primary-o-10 text-primary"></i>'
+            },
+            ajax: {
+                "url": "{% url 'ajax-get-players' %}",
+                "headers": { "X-CSRFToken": '{{csrf_token}}' },
+                "type": 'POST',
+                "data": function ( d ) {
+                    d.from_date =  $("#start_date").val(),
+                    d.to_date = $("#end_date").val(),
+                    d.horse_name = $("#horse_name").val(),
+                    d.horse_country = $("#sel_horse_coutry").val(),
+                    d.horse_jockey = $("#horse_jockey").val(),
+                    d.horse_trainer = $("#horse_trainer").val(),
+                    d.sire = $("#sire").val(),
+                    d.dam = $("#dam").val(),
+                    d.damsire = $("#damsire").val()
+                },
+                "dataSrc": function ( json ) {
+                    if(json.all_length >= 3000){
+                        $("#txt_info").html(`There are ${json.all_length} search result, Please give full query for improving speed!`);
+                        $("#txt_info").show();
+                    }else{
+                        $("#txt_info").html("");
+                        $("#txt_info").hide();
+                    }
+                    return json.data;
+                } 
+            },
+            columns: [
+                { "data": "sdate" },
+                { "data": "horse_name" },
+                { "data": "prize_money" },
+                { "data": "draw" },
+                { "data": "price_decimal" },
+                { "data": "horse_age" },
+                { "data": "horse_weight" },
+                { "data": "horse_or" },
+                { "data": "horse_jockey" },
+                { "data": "horse_trainer" },
+                { "data": "color" },
+                { "data": "headgear" },
+                { "data": "dist_upper" },
+                { "data": "racecard_number" },
+                { "data": "price_var" },
+                { "data": "sire" },
+                { "data": "dam" },
+                { "data": "damsire" },
+            ],
+            columnDefs: [
+                { 
+                    width: '5%', 
+                    targets: 0,
+                },
+                { 
+                    width: '10%', 
+                    targets: 1,
+                    "render": function ( data, type, row ){
+                        return `${data} <span class="float-right font-weight-bold text-danger">${row["horse_country"]}</span>`;
+                    }, 
+                },
+                {
+                    width: '5%',
+                    targets: 2,
+                    "render": function ( data, type, row ){
+                        var positionHtml;
+                        if (row['position'] == "1" || row['position'] == "2" || row['position'] == "3"){
+                            positionHtml = `<span class="float-right label pulse pulse-primary label-primary"><span class="position-relative">${row['position']}</span><span class="pulse-ring"></span></span>`;
+                        }else{
+                            positionHtml = `<span class="float-right label label-primary">${row['position']}</span>`;
+                        }
+                        return `${row['prize_currency']} ${data} ${positionHtml}`;
+                    }, 
+                },
+                { 
+                    width: '3%', 
+                    targets: 3,
+                },
+                {
+                    width: '5%',
+                    targets: 4,
+                    "render": function ( data, type, row ){
+                        return `${parseFloat(row['price_decimal'].toFixed(3))} - ${row['price_fraction']} <span class="float-right font-weight-bold text-info">${row['price_symbol']}</span>`;
+                    }, 
+                },
+                {
+                    width: '7%',
+                    targets: 5,
+                    "render": function ( data, type, row ){
+                        return `${row['birth_date']} <span class="float-right label pulse pulse-danger label-primary"><span class="position-relative">${row['horse_age']}</span><span class="pulse-ring"></span></span>`;
+                    },
+                },
+                { width: '3%', targets: 6 },
+                {   
+                    width: '6%',
+                    targets: 7,
+                    "render": function ( data, type, row ){
+                        return `${row['horse_or']} / ${row['horse_ts']} / ${row['horse_rpr']}`;
+                    }, 
+                },
+                { 
+                    width: '9%', 
+                    targets: 8 
+                },
+                { 
+                    width: '9%', 
+                    targets: 9 
+                },
+                { 
+                    width: '4%', 
+                    targets: 10,
+                    "render": function ( data, type, row ){
+                        return `<span class="font-weight-bold text-primary ml-2">${row['color']}</span>  <span class="mr-2 float-right font-weight-bold text-info">${row['sex']}</span>`;
+                    }, 
+                },
+                { 
+                    width: '3%', 
+                    targets: 11,
+                    "render": function ( data, type, row ){
+                        return `<span class="font-weight-bold ml-2">${row['headgear']}</span>  <span class="mr-2 float-right font-weight-bold text-info">${row['wind_12']}</span>`;
+                    }, 
+                },
+                { 
+                    width: '3%', 
+                    targets: 12,
+                    "render": function ( data, type, row ){
+                        return `<span class="ml-2">${row['dist_upper']}</span> <span class="float-right mr-2">${row['dist_beaten']}</span>`;
+                    }, 
+                },
+                { width: '2%', targets: 13 },
+                {
+                    width: '6%', 
+                    targets: 14,
+                    
+                },
+                {
+                    width: '9%', 
+                    targets: 15,
+                    "render": function ( data, type, row ){
+                        return `${row['sire']}  <span class="mr-2 float-right font-weight-bold text-danger">${row['sire_country']}</span> `;
+                    }, 
+                },
+                {
+                    width: '9%', 
+                    targets: 16,
+                    "render": function ( data, type, row ){
+                        return `${row['dam']}  <span class="mr-2 float-right font-weight-bold text-danger">${row['dam_country']}</span>`;
+                    }, 
+                },
+                {
+                    width: '10%', 
+                    targets: 17,
+                },
+            ],
+        });
+        
+    </script>
+{% endblock %}

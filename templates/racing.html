@@ -1,0 +1,291 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+{% block css%}
+    
+{% endblock %}
+{% block content %}
+    <!--begin::Container-->
+    <div class="container-fluid">
+        <div class="card card-custom gutter-b">
+            <div class="card-header pr-1">
+                <div class="card-title">
+                    <h3 class="card-label">Races</h3>
+                </div>
+                <div class="card-toolbar col-12 col-lg-11 pr-2">
+                    <div class="row w-100">
+                        <div class="col-12 col-lg-4">
+                            <div class="row">
+                                <div class="col-12 col-lg-4 pl-1 pr-1">
+                                    <span class="text-right">Country</span>
+                                    <select class="form-control select2" id="sel_country" name="sel_country" multiple="multiple">
+                                        {% for item in country%}
+                                            <option value="{{item.country}}">{{item.country}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-12 col-lg-8 pl-1 pr-1">
+                                    <span class="text-right">Track</span>
+                                    <select class="form-control select2" id="sel_track" name="sel_track" multiple="multiple">
+                                        {% for item in tracks%}
+                                            <option value="{{item.track}}">{{item.track}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-4">
+                            <div class="row">
+                                <div class="col-12 col-lg-8 pl-1 pr-1">
+                                    <span class="text-right">Race Name</span>
+                                    <select class="form-control select2" id="sel_race_name" name="sel_race_name" multiple="multiple">
+                                        {% for item in race_names %}
+                                            <option value="{{item}}">{{item}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-12 col-lg-4 pl-1 pr-1">
+                                    <span class="text-right">Race Class</span>
+                                    <select class="form-control select2" id="sel_race_class" name="sel_race_class" multiple="multiple">
+                                        {% for item in race_classes%}
+                                            <option value="{{item.race_class}}">{{item.race_class}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-4">
+                            <div class="row" >
+                                <div class="col-12 col-lg-2 pl-1 pr-1">
+                                    <span class="text-right">From</span>
+                                    <input id="start_date" type="text" class="form-control pl-1 pr-1" readonly="readonly" placeholder="Select date" value="{{ from_date }}"/>
+                                </div>
+                                <div class="col-12 col-lg-2 pl-1 pr-1">
+                                    <span class="text-right">To</span>
+                                    <input  id="end_date"  type="text" class="form-control pl-1 pr-1" readonly="readonly" placeholder="Select date" value="{{ to_date }}"/>
+                                </div>
+                                <div class="col-12 col-lg-5 pl-1 pr-1">
+                                    <span class="text-right">Going</span>
+                                    <select class="form-control select2" id="sel_going" name="sel_going" multiple="multiple">
+                                        {% for item in goings %}
+                                            <option value="{{item.going}}">{{item.going}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-12 col-lg-3 pl-1 pr-1 text-center">
+                                    <br>
+                                    <b id="btn_search" class="btn btn-success">
+                                        <i class="fas fa-search"></i> Search
+                                    </b>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row w-100">
+                        <div class="col-12">
+                            <span id="txt_info" class="text-danger mr-4  float-right" style="display: none;"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body pt-1">
+                <table id="dataTable" class="table table-separate table-hover table-head-custom dataTable dtr-inline pt-1" style="margin-top: 0px !important">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Racing Title</th>
+                            <th>Track</th>
+                            <th>Race Name</th>
+                            <th>Race Class</th>
+                            <th>Code</th>
+                            <th>Handicap Rating</th>
+                            <th>Age Class</th>
+                            <th>Distance</th>
+                            <th>Going</th>
+                            <th>Prize</th>
+                            <th>Total Runner</th>
+                            <th>Winning Time</th>
+                            <th>Winning Time Var</th>
+                            <th>Total SP</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!--end::Container-->
+{% endblock %}
+{% block javascript %}
+    <script>
+        var bClickable = true;
+        var arrows = {
+            leftArrow: '<i class="la la-angle-left"></i>',
+            rightArrow: '<i class="la la-angle-right"></i>'
+        }
+        $("#start_date").datepicker({
+            templates: arrows,
+            todayHighlight: true,
+            startDate: '{{ start_date }}',
+            format: 'yyyy-mm-dd'
+        }).on('changeDate', function(e) {
+            $("#start_date").datepicker('hide')
+        });
+        $("#end_date").datepicker({
+            templates: arrows,
+            todayHighlight: true,
+            endDate: new Date(),
+            format: 'yyyy-mm-dd'
+        }).on('changeDate', function(e) {
+            $("#end_date").datepicker('hide')
+        });
+        $('#sel_country').select2({
+            placeholder: "Select a country",
+        });
+        $('#sel_track').select2({
+            placeholder: "Select a track",
+        });
+        $('#sel_race_name').select2({
+            placeholder: "Select a race name",
+        });
+        $('#sel_race_class').select2({
+            placeholder: "Select a race class",
+        });
+        $('#sel_going').select2({
+            placeholder: "Select a going",
+        });
+        
+        $('#btn_search').on('click', function(){
+            if (bClickable){
+                bClickable = false;
+                $(this).html(' Search');
+                $(this).addClass('spinner spinner-darker-light spinner-left mr-3');
+                dtTable.ajax.reload(function(){
+                    bClickable = true;
+                    $('#btn_search').removeClass('spinner spinner-darker-light spinner-left mr-3');
+                    $('#btn_search').html('<i class="fas fa-search"></i> Search');
+                }, false);
+            }
+        })
+        var dtTable = $('#dataTable').DataTable({
+            processing: true,
+            responsive: true,
+            language: {
+                processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw bg-primary-o-10 text-primary"></i>'
+            },
+            ajax: {
+                "url": "{% url 'ajax-get-racings' %}",
+                "headers": { "X-CSRFToken": '{{csrf_token}}' },
+                "type": 'POST',
+                "data": function ( d ) {
+                    d.from_date =  $("#start_date").val(),
+                    d.to_date = $("#end_date").val(),
+                    d.sel_country = $("#sel_country").val(),
+                    d.sel_track = $("#sel_track").val(),
+                    d.sel_race_name = $("#sel_race_name").val(),
+                    d.sel_race_class = $("#sel_race_class").val(),
+                    d.sel_going = $("#sel_going").val()
+                },
+                "dataSrc": function ( json ) {
+                    //Make your callback here.
+                    if(json.all_length >= 3000){
+                        $("#txt_info").html(`There are ${json.all_length} search result, Please give full query for improving speed!`);
+                        $("#txt_info").show();
+                    }else{
+                        $("#txt_info").html("");
+                        $("#txt_info").hide();
+                    }
+                    
+                    return json.data;
+                } 
+            },
+            columns: [
+                { "data": "sdate" },
+                { "data": "race_title" },
+                { "data": "track" },
+                { "data": "race_name" },
+                { "data": "race_class" },
+                { "data": "marker" },
+                { "data": "handicap_rating" },
+                { "data": "age_class" },
+                { "data": "distance" },
+                { "data": "going" },
+                { "data": "prize" },
+                { "data": "total_runners" },
+                { "data": "winning_time" },
+                { "data": "winning_timevar" },
+                { "data": "total_sp" },
+            ],
+            columnDefs: [
+                { 
+                    width: '7%', 
+                    targets: 0,
+                    "render": function ( data, type, row ){
+                        return data + " " + row["stime"].substring(0, 5);
+                    },  
+                },
+                { 
+                    width: '12%', 
+                    targets: 1,
+                    "render": function ( data, type, row ){
+                        return "<a href='" + row["link"] + "'>" + row["race_title"] + "</a>";
+                    }, 
+                },
+                {
+                    width: '10%',
+                    targets: 2,
+                    "render": function ( data, type, row ){
+                        if (row["country"] == "UK"){
+                            return `<span>${data}</span><i class="ml-1 flag-icon flag-icon-gb float-right" title="${row["country"]}"></i>`
+                        }else{
+                            return `<span>${data}</span><i class="ml-1 flag-icon flag-icon-ie float-right" title="${row["country"]}"></i>`
+                        }
+                    }, 
+                },
+                { 
+                    width: '8%', 
+                    targets: 3,
+                    "render": function ( data, type, row ){
+                        var raceNameHtml = "";
+                        var temp = data.split(";")
+                        temp.forEach(function(item){
+                            raceNameHtml += item + '<br>';
+                        })
+                        return raceNameHtml;
+                    }, 
+                },
+                { 
+                    targets: 5,
+                    "render": function ( data, type, row ){
+                        if (data == "All Other"){
+                            return `<span class="label label-lg font-weight-bold  label-light-warning label-inline">${data}</span>`
+                        }else if (data == "Flat"){
+                            return `<span class="label label-lg font-weight-bold  label-light-primary label-inline">${data}</span>`
+                        }else{
+                            return `<span class="label label-lg font-weight-bold  label-light-success label-inline">${data}</span>`
+                        }
+                    }, 
+                },
+                { width: '4%', targets: 6 },
+                { 
+                    width: '6%', 
+                    targets: 10,
+                    "render": function ( data, type, row ){
+                        var raceNameHtml = "";
+                        var temp = data.split(";")
+                        temp.forEach(function(item){
+                            raceNameHtml += item + '<br>';
+                        })
+                        return raceNameHtml;
+                    }, 
+                },
+                { width: '3%', targets: 11 },
+                { width: '3%', targets: 12 },
+                { width: '3%', targets: 13 },
+                { width: '3%', targets: 14 },
+            ],
+        });
+        
+    </script>
+{% endblock %}
